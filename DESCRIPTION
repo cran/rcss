@@ -1,8 +1,8 @@
 Package: rcss
 Type: Package
 Title: Convex Switching Systems
-Version: 1.1
-Date: 2016-06-18
+Version: 1.2
+Date: 2017-01-28
 Author: Juri Hinz and Jeremy Yee
 Maintainer: Jeremy Yee <jeremyyee@outlook.com.au>
 Description: The numerical treatment of optimal switching problems in a finite time setting when the state evolves as a controlled Markov chain consisting of a uncontrolled continuous component following linear dynamics and a controlled Markov chain taking values in a finite set. The reward functions are assumed to be convex and Lipschitz continuous in the continuous state. The action set is finite.
@@ -15,6 +15,6 @@ Suggests: R.rsp
 VignetteBuilder: R.rsp
 NeedsCompilation: yes
 BugReports: https://github.com/YeeJeremy/rcss/issues
-Packaged: 2016-06-18 06:02:26 UTC; jeremyyee
+Packaged: 2017-01-27 23:21:46 UTC; jeremyyee
 Repository: CRAN
-Date/Publication: 2016-06-18 10:12:55
+Date/Publication: 2017-01-30 21:20:58
