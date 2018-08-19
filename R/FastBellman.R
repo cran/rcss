@@ -1,43 +1,26 @@
-## Copyright 2015 <Jeremy Yee> <jeremyyee@outlook.com.au>
-## Perform fast Bellman recursion
+## Copyright 2017 <Jeremy Yee> <jeremyyee@outlook.com.au>
+## Bellman recursion using conditional expectation matrices
 ################################################################################
 
-FastBellman <- function(grid, reward, control, disturb, weight, r_index,
-                        Neighbour, smooth = 1, SmoothNeighbour) {
-    ## Making sure the inputs are in correct format
-    r_dims <- dim(reward)
-    if (length(r_dims) != 5) stop("length(dim(reward)) != 5)")
-    if (r_dims[1] != nrow(grid)) stop("dim(reward)[1] != nrow(grid)")
-    if (r_dims[2] != ncol(grid)) stop("dim(reward)[2] != ncol(grid)")
-    ##if (any(dim(control) != dim(reward)[3:4])) {
-    ##    stop("any(dim(control) != dim(reward)[3:4])")
-    ##}
-    if (ncol(r_index) != 2) stop("ncol(r_index) != 2")
-    if (smooth < 1) stop("smooth must be >= 1")
-    if (smooth >= nrow(grid)) stop("smooth must be < nrow(grid)")
-    ## Call the C++ functions
-    if (missing(Neighbour)) {
-        Neighbour <- function(query, ref) {
-            rflann::Neighbour(query, ref, 1, "kdtree", 0, 1)$indices
-        }
+FastBellman <- function(grid, reward, scrap, control, disturb, weight, r_index,
+                        smooth = 1) {
+    ## Use the nearest neighbour function from nabor package
+    neighbour <- function(query, reference, knn) {
+        output <- nabor::knn(reference, query, knn)
+        return(output$nn.idx)
     }
-    if (missing(SmoothNeighbour)) {
-        SmoothNeighbour <- function(query, ref) {
-            rflann::Neighbour(query, ref, smooth, "kdtree", 0, 1)$indices
-        }
-    }    
-    output <- .Call('rcss_FastBellman', PACKAGE = 'rcss', grid, reward,
-                    control, r_index, disturb, weight, Neighbour, smooth,
-                    SmoothNeighbour)
+    ## Call function 
+    output <- .Call('_rcss_FastBellman', PACKAGE = 'rcss', grid, reward, scrap,
+                    control, r_index, disturb, weight, smooth, neighbour)
     ## Put output into correct format
     n_grid <- nrow(grid)
     n_dim <- ncol(grid)
-    n_position <- dim(reward)[3]
-    n_dec <- dim(reward)[5]
-    output$value <- array(data = output$value, dim = c(n_grid, n_dim,
-                                                   n_position, n_dec))
-    output$expected <- array(data = output$expected, dim = c(n_grid, n_dim,
-                                                         n_position, n_dec))   
+    n_position <- dim(reward)[4]
+    n_dec <- dim(reward)[5] + 1
+    dimens <- c(n_grid, n_dim, n_position, n_dec)
+    dimens1 <- c(n_grid, n_dim, n_position, n_dec - 1)
+    output$value <- array(output$value, dim = dimens)
+    output$expected <- array(output$expected, dim = dimens1)
     cat("Done.\n")
-    return(output)
+    return(output)   
 }

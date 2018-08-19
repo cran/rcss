@@ -1,39 +1,33 @@
 \name{StochasticGrid}
 \alias{StochasticGrid}
 \title{Stochastic grid}
-\description{Generate a grid using k-means clsutering.}
+\description{Generate a grid using k-means clustering.}
 \usage{
-StochasticGrid(start, disturb, n_grid, max_iter, warning)
+StochasticGrid(path, n_grid, max_iter, warning)
 }
 \arguments{
-  \item{start}{Array representing the start. The first entry must be 1
-    and array [-1] represents the starting state.}
-  \item{disturb}{4 dimensional array containing the path disturbances.
-    Matrix [,,i,j] represents the disturbance at time i for sample path j.}
+  \item{path}{3-D array representing sample paths.  Entry [i,,j]
+    represents the state at time j for sample path i.}
   \item{n_grid}{Number of grid points in the stochastic grid.}
-  \item{max_iter}{Maximum iterations in the k-means clustering algorithm.}
+  \item{max_iter}{Maximum iterations in the k-means clustering
+  algorithm.}
   \item{warning}{Boolean indicating whether messages from the k-means
     clustering algorithm are to be displayed}
 }
 \value{
-  Matrix representing the stochastic matrix. Each row represents a
-  particular grid point. The first column contains only 1s. 
+  Matrix representing the stochastic grid. Each row represents a
+  particular grid point. The first column contains only 1. 
 }
 \examples{
-## Generate a stochastic matrix using an AR(2) process
-start <- c(1, 0, 0)
-n_dim <- length(start)
-n_path <- 10
-psi1 <- 0.3
-psi2 <- 0.65
-n_dec <- 21
-path_disturb <- array(data = matrix(c(1, 0,    0,
-                                      0, 0,    1,
-                                      0, psi2, psi1), ncol = 3, byrow = TRUE),
-                      dim = c(n_dim, n_dim, (n_dec - 1), n_path))
-path_disturb[3,1,,] <- runif((n_dec - 1) * n_path, -1, 1)
-n_grid <- 10
-grid <- StochasticGrid(start, path_disturb, n_grid, 10, TRUE)
+## Generate paths
+start <- c(1, 36)
+path_disturb <- array(0, dim = c(2, 2, 100, 50))
+path_disturb[1, 1,,] <- 1
+rand1 <- rnorm((50 * 100) / 2)
+rand1 <- as.vector(rbind(rand1, -rand1))
+path_disturb[2, 2,,] <- exp((0.06 - 0.5 * 0.2^2) * 0.02 + 0.2 * sqrt(0.02) * rand1)
+path <- PathDisturb(start, path_disturb)
+sgrid <- StochasticGrid(path, 81, 10)
 }
 \author{Jeremy Yee}
 
