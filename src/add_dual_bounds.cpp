@@ -2,10 +2,6 @@
 // Bounds estimates using additive duals
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #include <algorithm>
 #include <RcppArmadillo.h>
 
@@ -48,7 +44,6 @@ Rcpp::List AddDualBounds(const arma::cube& path,
     for (int tt = (n_dec - 2); tt >= 0; tt--) {
       reward = Rcpp::as<arma::cube>(Reward_(
           Rcpp::as<Rcpp::NumericMatrix>(Rcpp::wrap(path.slice(tt))), tt + 1));
-#pragma omp parallel for private(policy, next)
       for (std::size_t ii = 0; ii < n_path; ii++) {
         for (std::size_t pp = 0; pp < n_pos; pp++) {
           // Primal values
@@ -74,7 +69,6 @@ Rcpp::List AddDualBounds(const arma::cube& path,
     for (int tt = (n_dec - 2); tt >= 0; tt--) {
       reward = Rcpp::as<arma::cube>(Reward_(
           Rcpp::as<Rcpp::NumericMatrix>(Rcpp::wrap(path.slice(tt))), tt + 1));
-#pragma omp parallel for private(policy, prob_weight, mod)
       for (std::size_t ii = 0; ii < n_path; ii++) {
         for (std::size_t pp = 0; pp < n_pos; pp++) {
           //  Primal values

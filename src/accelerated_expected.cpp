@@ -2,10 +2,6 @@
 // Expected value using row rearrange + k nearest neighbour
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #include "inst/include/accelerated.h"
 
 // Perform bellman recursion using row rearrangement + nearest neighbours
@@ -25,7 +21,6 @@ arma::mat AcceleratedExpected(const arma::mat& grid,
   {
     // Disturbed grids
     arma::mat disturb_grid(n_grid * n_disturb, n_dim);
-#pragma omp parallel for
     for (std::size_t dd = 0; dd < n_disturb; dd++) {
       disturb_grid.rows(n_grid * dd, n_grid * (dd + 1) - 1) =
           grid * disturb.slice(dd).t();

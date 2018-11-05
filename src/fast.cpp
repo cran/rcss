@@ -2,10 +2,6 @@
 // Fast methods for FastBellman and FastExpected
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #include "inst/include/fast.h"
 
 // Block diagonal matrix
@@ -33,7 +29,6 @@ arma::mat Smooth(const arma::mat& grid,
   arma::uword best;
   arma::umat neighbour = arma::conv_to<arma::umat>::from(smooth_neighbour);
   arma::urowvec near(n_neighbour);
-#pragma omp parallel for private(best, near)
   for (std::size_t gg = 0; gg < n_grid; gg++) {
     near = neighbour.row(gg);
     (subgradient.rows(near) * t_grid.col(gg)).max(best);

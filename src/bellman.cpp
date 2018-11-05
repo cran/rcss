@@ -2,15 +2,8 @@
 // Bellman recursion using row rearrangement
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #include "inst/include/bellman.h"
 #include "inst/include/slow.h"
-
-#pragma omp declare reduction( + : arma::mat : omp_out += omp_in ) \
-  initializer( omp_priv = omp_orig )
 
 // Expected value using row rearrangement
 //[[Rcpp::export]]
@@ -25,7 +18,6 @@ arma::mat Expected(const arma::mat& grid,
   // Computing the continuation value function
   arma::mat continuation(n_grid, n_dim, arma::fill::zeros);
   arma::mat d_value(n_grid, n_dim);
-#pragma omp parallel for private(d_value) reduction(+:continuation)
   for (std::size_t dd = 0; dd < n_disturb; dd++) {
     d_value = value * disturb.slice(dd);
     continuation += weight(dd) * Optimal(grid, d_value);

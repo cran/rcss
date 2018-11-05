@@ -2,10 +2,6 @@
 // Simulating paths using supplied disturbances
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #include <RcppArmadillo.h>
 
 //[[Rcpp::export]]
@@ -25,7 +21,6 @@ arma::cube PathDisturb(const arma::vec& start,
     path.slice(0).col(ii).fill(start(ii));
   }
   // Disturb the paths
-#pragma omp parallel for
   for (std::size_t pp = 0; pp < n_path; pp++) {
     for (std::size_t tt = 1; tt < n_dec; tt++) {
       path.slice(tt).row(pp) = path.slice(tt - 1).row(pp) *

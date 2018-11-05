@@ -2,15 +2,8 @@
 // Bellman recursion using row rearrange + k nearest neighbour
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #include "inst/include/bellman.h"
 #include "inst/include/accelerated.h"
-
-#pragma omp declare reduction( + : arma::mat : omp_out += omp_in )    \
-  initializer( omp_priv = omp_orig )
 
 // Perform bellman recursion using nearest neighbours
 //[[Rcpp::export]]
@@ -50,7 +43,6 @@ Rcpp::List AcceleratedBellman(const arma::mat& grid,
   {
     // Disturbed grids
     arma::mat disturb_grid(n_grid * n_disturb, n_dim);
-#pragma omp parallel for
     for (std::size_t dd = 0; dd < n_disturb; dd++) {
       disturb_grid.rows(n_grid * dd, n_grid * (dd + 1) - 1) =
           grid * disturb.slice(dd).t();
@@ -76,7 +68,6 @@ Rcpp::List AcceleratedBellman(const arma::mat& grid,
     Rcpp::Rcout << tt << ".";
     // Approximating the continuation value
     temp_cont.fill(0.);
-#pragma omp parallel for private(d_value) reduction(+:temp_cont)
     for (std::size_t dd = 0; dd < n_disturb; dd++) {
       for (std::size_t pp = 0; pp < n_pos; pp++) {
         d_value = value.slice(tt + 1).cols(n_dim * pp, n_dim * (pp + 1) - 1)

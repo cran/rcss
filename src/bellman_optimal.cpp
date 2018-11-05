@@ -2,10 +2,6 @@
 // Determining the optimal action and corresponding subgradient
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #include "inst/include/bellman.h"
 
 // Bellman optimal for full control case
@@ -23,9 +19,7 @@ void BellmanOptimal(const arma::mat& grid,
   arma::cube subgrad(n_grid, n_dim * n_action, n_pos);
   std::size_t ii;
   arma::uword best;
-#pragma omp parallel
   {
-#pragma omp for private(ii)
     for (std::size_t pp = 0; pp < n_pos; pp++) {
       for (std::size_t aa = 0; aa < n_action; aa++) {
         ii = n_dim * n_action * pp + n_dim * aa;
@@ -38,7 +32,6 @@ void BellmanOptimal(const arma::mat& grid,
                         .cols(n_dim * aa, n_dim * (aa + 1) - 1) % grid, 1);
       }
     }
-#pragma omp for private(best)
     for (std::size_t pp = 0; pp < n_pos; pp++) {
       for (std::size_t gg = 0; gg < n_grid; gg++) {
         value_temp.slice(pp).row(gg).max(best);
@@ -64,9 +57,7 @@ void BellmanOptimal2(const arma::mat& grid,
   arma::cube subgrad(n_grid, n_action * n_dim, n_pos);
   std::size_t ii;
   arma::uword best;
-#pragma omp parallel
   {
-#pragma omp for private(ii)
     for (std::size_t pp = 0; pp < n_pos; pp++) {
       for (std::size_t aa = 0; aa < n_action; aa++) {
         ii = n_dim * n_action * pp + n_dim * aa;
@@ -82,7 +73,6 @@ void BellmanOptimal2(const arma::mat& grid,
                         .cols(n_dim * aa, n_dim * (aa + 1) - 1) % grid, 1);
       }
     }
-#pragma omp for private(best)
     for (std::size_t pp = 0; pp < n_pos; pp++) {
       for (std::size_t gg = 0; gg < n_grid; gg++) {
         value_temp.slice(pp).row(gg).max(best);

@@ -2,10 +2,6 @@
 // Additive duals using nearest neighbours
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 #include <RcppArmadillo.h>
 
 // Calculate the martingale increments using nearets neighbours
@@ -51,7 +47,6 @@ arma::cube FastAddDual(const arma::cube& path,
   for (std::size_t tt = 0; tt < (n_dec - 2); tt++) {
     Rcpp::Rcout << tt << "...";
     // 1 step subsimulation
-#pragma omp parallel for private(ll)
     for (std::size_t ii = 0; ii < n_path; ii++) {
       for (std::size_t ss = 0; ss < n_subsim; ss++) {
         ll = n_subsim * ii + ss;
@@ -78,7 +73,6 @@ arma::cube FastAddDual(const arma::cube& path,
   // Scrap value
   Rcpp::Rcout << n_dec - 1 << "...";
   // 1 step subsimulation
-#pragma omp parallel for private(ll)
   for (std::size_t ii = 0; ii < n_path; ii++) {
     for (std::size_t ss = 0; ss < n_subsim; ss++) {
       ll = n_subsim * ii + ss;
