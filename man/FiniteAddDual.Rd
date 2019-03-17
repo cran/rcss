@@ -52,6 +52,7 @@ scrap[in_money, 2, 2] <- -1
 scrap[,,2] <- exp(-0.06 * 0.02 * 50) * scrap[,,2]
 r_index <- matrix(c(2, 2), ncol = 2)
 bellman <- FastBellman(grid, reward, scrap, control, disturb, weight, r_index)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(12345)
 start <- c(1, 36) ## starting state
 path_disturb <- array(0, dim = c(2, 2, 100, 50))
